@@ -109,19 +109,19 @@
         FB.api('/me/friends', function (friends) { 
 
             var friendSource = $.map(friends.data, function(val, i){
-            return {
-                    label: val.name,
-                    value: val.id,
-                    gameID: -1,
-                    gameState: "Invite",
-                };
+                return {
+                        label: val.name,
+                        value: val.id,
+                        gameID: -1,
+                        gameState: "Invite",
+                }; 
             });
 
             var fbids = [];
 
             for (var i = 0; i < friends.data.length; i++){
                 var friend = friends.data[i];
-               
+
                 fbids.push(friend.id);
                 if ($('#contact-' + friend.id).length == 0){
                     $('#friends').append($.tmpl("Contact", { id : friend.id, name : friend.name, status : "invite"}));
@@ -164,7 +164,7 @@
                         if (friend.value == friendFBID)
                         {
                             friend.gameID = activeGames[i].ID;
-                            friend.gameState = "waiting";
+                            friend.gameState = "waiting...";
                         }
                     });    
                 }
@@ -202,8 +202,6 @@
                 .appendTo(ul);
             };
 
-
-
             //console.log(data);
         }, "json");
     }
@@ -211,8 +209,8 @@
 
     function DeleteAppRequest(requestId) {
       FB.api(requestId, 'delete', function(response) {
-        console.log('delete app request: ');
-        console.log(response);
+        //console.log('delete app request: ');
+        //console.log(response);
       });
     }
 
@@ -224,11 +222,12 @@
         }, 
         function requestCallback(response)
         {
-            console.log(response);
+            //console.log(response);
             if(response && response.request) {   
                 $.get('/game/create?OpponentFBID='+FBID+'&appRequest='+response.request, function(data){
                     gameId = data.ID;
-                    LoadGame(gameId);
+                    gamesHash[data.ID] = data;
+                    LoadGame(data.ID);
                 });
             } else {
                     // No requests sent, you can do what you want (like...nothing, and stay on the page).
@@ -331,14 +330,13 @@
         data = gamesHash[id];
           
         curAppRequest = data.curAppRequest;
-
         if (data.ChallengerID == userId)
         {  
             fill = player1Fill;
             userFBID = data.ChallengerFBID;
             userFirstName = data.ChallengerFirstName;
             userLastName = data.ChallengerLastName;
-            opponentFBID = data.OpponentFBID;
+            opponentFBID = data.OpponentFBID; 
             if (data.OpponentFirstName != null)
                 opponentFirstName = data.OpponentFirstName;
             else
