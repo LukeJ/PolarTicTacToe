@@ -46,7 +46,6 @@ namespace PolarTicTacToe.Utils
             //checking both spirals
             return outer1
                 || outer2;
-
         }
 
         private bool CheckVertical(Game game)
@@ -90,7 +89,7 @@ namespace PolarTicTacToe.Utils
 
         internal bool HasPlayed(Models.Game game, Tuple<int, int> spot)
         {
-            return game.MoveList.FirstOrDefault(p => p.position.Equals(spot)) != null;
+            return game.MoveList.FirstOrDefault(p => p.position.X == spot.Item1 && p.position.Y == spot.Item2) != null;
         }
     }
 }
