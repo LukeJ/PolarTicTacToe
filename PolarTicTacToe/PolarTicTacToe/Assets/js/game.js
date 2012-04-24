@@ -1,10 +1,13 @@
-﻿var BoardSlice, BullsEye, DartBoard;
+﻿var BoardSlice, BullsEye, DartBoard, player1Fill, player2Fill, winFill;
 var __bind = function (fn, me) { return function () { return fn.apply(me, arguments); }; };
 DartBoard = (function () {
     DartBoard.prototype.ScoreOrder = [20, 1, 18, 4, 13, 6, 10, 15];
     function DartBoard(game, postAction, moves) {
         this.moves = moves;
         this.game = game;
+        this.player1Fill = player1Fill;
+        this.player2Fill = player2Fill;
+        this.winFill = winFill;
         this.paper = Raphael('board');
         this.originX = Math.min(this.paper.width, this.paper.height) / 2;
         this.originY = Math.min(this.paper.width, this.paper.height) / 2;
@@ -37,7 +40,10 @@ DartBoard = (function () {
     DartBoard.prototype.findSectionIndex = function (x, y) {
         for (var i = 0; i < this.moves.length; i++) {
             if (this.moves[i].position.X == x && this.moves[i].position.Y == y) {
-                return i;
+                return {
+                    i: i,
+                    isWinner: this.moves[i].isWinner,
+                };
             }
         }
         return null;
@@ -130,8 +136,8 @@ BoardSlice = (function () {
         var j = 0;
         for (var i = 0; i < 5; i++) {
             var y = this.Sections[i][2];
-            var index = this.board.findSectionIndex(x, y);
-            if (index == null) {
+            var result = this.board.findSectionIndex(x, y);
+            if (result == null) {
                 if (j % 4 == 0) {
                     this.slices[j].attr({
                         fill: this.DoubleTripleColors[idx % 2]
@@ -141,13 +147,20 @@ BoardSlice = (function () {
                         fill: this.SingleColors[idx % 2]
                     });
                 }
-            } else if (index % 2 == 0) {
+            }
+            else if(result.isWinner)
+            {
                 this.slices[j].attr({
-                    fill: "#60af75"
+                    fill: winFill
                 });
-            } else if (index % 2 == 1) {
+            }
+             else if (result.i % 2 == 0) {
                 this.slices[j].attr({
-                    fill: "#bb2e36"
+                    fill: player1Fill
+                });
+            } else if (result.i % 2 == 1) {
+                this.slices[j].attr({
+                    fill: player2Fill
                 });
             }
             j = j + 2;

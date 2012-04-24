@@ -8,6 +8,8 @@ namespace PolarTicTacToe.Utils
 {
     public class GameRules
     {
+        List<Coordinate> winningCoords = new List<Coordinate>();
+
         internal bool IsFinished(Models.Game game, out int? winner)
         {
             ///TODO: implement this
@@ -20,6 +22,7 @@ namespace PolarTicTacToe.Utils
 
             if (CheckHorizontal(game) || CheckVertical(game) || CheckSpiral(game))
             {
+                game.SetWinningMoves(winningCoords);
                 winner = game.MoveList.Last().UserID;
                 return true;
             }
@@ -43,6 +46,22 @@ namespace PolarTicTacToe.Utils
             var outer1 = (game[outerPosition1] == playerID && game[outerPosition1 - new Coordinate(1, 1)] == playerID && game[outerPosition1 - new Coordinate(2, 2)] == playerID && game[outerPosition1 - new Coordinate(3, 3)] == playerID);
             var outer2 = (game[outerPosition2] == playerID && game[outerPosition2 + new Coordinate(1, -1)] == playerID && game[outerPosition2 + new Coordinate(2, -2)] == playerID && game[outerPosition2 + new Coordinate(3, -3)] == playerID);
 
+            if (outer1)
+            {
+                winningCoords.Add(outerPosition1);
+                winningCoords.Add(outerPosition1 - new Coordinate(1, 1));
+                winningCoords.Add(outerPosition1 - new Coordinate(2, 2));
+                winningCoords.Add(outerPosition1 - new Coordinate(3, 3));
+            }
+
+            if (outer2)
+            {
+                winningCoords.Add(outerPosition2);
+                winningCoords.Add(outerPosition2 + new Coordinate(1, -1));
+                winningCoords.Add(outerPosition2 + new Coordinate(2, -2));
+                winningCoords.Add(outerPosition2 + new Coordinate(3, -3));
+            }
+
             //checking both spirals
             return outer1
                 || outer2;
@@ -55,7 +74,17 @@ namespace PolarTicTacToe.Utils
             int y = lastMove.position.Y;
             int x = lastMove.position.X;
 
-            return game[x, 0] == playerID && game[x, 1] == playerID && game[x,2] == playerID && game[x, 3] == playerID;
+            bool winner = game[x, 0] == playerID && game[x, 1] == playerID && game[x, 2] == playerID && game[x, 3] == playerID;
+
+            if (winner)
+            {
+                winningCoords.Add(new Coordinate(x, 0));
+                winningCoords.Add(new Coordinate(x, 1));
+                winningCoords.Add(new Coordinate(x, 2));
+                winningCoords.Add(new Coordinate(x, 3));
+            }
+           
+            return winner;
         }
 
         private bool CheckHorizontal(Models.Game game)
@@ -67,6 +96,7 @@ namespace PolarTicTacToe.Utils
             for (int i = lastMove.position.X - 4; i < lastMove.position.X + 4; i++)
             {
                 Coordinate curPosition = new Coordinate(i, lastMove.position.Y);
+                winningCoords.Add(curPosition);
 
                 int? userID = game[curPosition.X, curPosition.Y];
 
@@ -80,10 +110,12 @@ namespace PolarTicTacToe.Utils
                 }
                 else
                 {
+                    winningCoords.Clear();
                     row = 0;
                 }
             }
 
+            winningCoords.Clear();
             return false;
         }
 

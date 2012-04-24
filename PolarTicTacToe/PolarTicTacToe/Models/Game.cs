@@ -76,10 +76,11 @@ namespace PolarTicTacToe.Models
                 {
                     winner = player;
                     game.WinnerID = winner;
-                    game.GameState = Utils.GameState.Finished.ToString();
+                    game.GameState = Utils.GameState.Finished.ToString();   
                 }
 
                 dataContext.SubmitChanges();
+
                 message = "";
 
                 return true;
@@ -106,8 +107,8 @@ namespace PolarTicTacToe.Models
                     string[] splitMove = curMove.Split(';');
                     int x = int.Parse(splitMove[0]);
                     int y = int.Parse(splitMove[1]);
-                    bool isWinner = bool.Parse(splitMove[2]);
                     DateTime time = DateTime.Parse(splitMove[2]);
+                    bool isWinner = bool.Parse(splitMove[3]);
                     MoveList.Add(new Move() { position = new Coordinate(x, y), time = time, UserID = userID.Value, isWinner = isWinner });
                     userID = userID == ChallengerID ? OpponentID : ChallengerID;
                 }
@@ -197,6 +198,30 @@ namespace PolarTicTacToe.Models
             PolarTicTacToeDataContext dataContext = new PolarTicTacToeDataContext();
 
             return (from p in dataContext.Games where p.GameState.Equals(Utils.GameState.Active.ToString()) && (p.OpponentID == id || p.ChallengerID == id) select p).ToList();
+        }
+
+        public void SetWinningMoves(List<Coordinate> winningCoords)
+        {
+
+            //PolarTicTacToeDataContext dataContext = new PolarTicTacToeDataContext();
+
+            //var curGame = (from p in dataContext.Games where p.ID == this.ID select p).FirstOrDefault();
+            var curGame = this;
+            var gameRules = new GameRules();
+
+            foreach (Coordinate curWinner in winningCoords)
+            {
+                int moveXIndex = curGame.Moves.IndexOf(curWinner.X+";"+curWinner.Y+";");
+                int moveYIndex = curGame.Moves.IndexOf(";", moveXIndex+1);
+                int moveDateIndex = curGame.Moves.IndexOf(";", moveYIndex+1);
+                int moveWinnerIndex = curGame.Moves.IndexOf(";", moveDateIndex+1);
+                string winnerSub = curGame.Moves.Substring(moveWinnerIndex+1, 5);
+                curGame.Moves = curGame.Moves.Remove(moveWinnerIndex + 1, 5);
+                curGame.Moves = curGame.Moves.Insert(moveWinnerIndex + 1, "true");
+            }
+            
+
+            //dataContext.SubmitChanges();
         }
     }
 }

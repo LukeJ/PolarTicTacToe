@@ -30,10 +30,9 @@
     var fill;
     var player1Fill = "#60af75";
     var player2Fill = "#bb2e36";
-    var winFill = "00FFFB";
+    var winFill = "#00FFFB";
     var friendGameStatus;
     var activeGames;
-    var friendGameStatus;
     var gamesHash = {};
 
     $(document).ready(function () {
@@ -142,7 +141,7 @@
             for (var i = 0; i < activeGames.length; i++){
                 var friendFBID = -1;
                 var status = "";
-
+              
                 if (activeGames[i].PendingPlayerFBID == @UserFacebookID){
                     if (activeGames[i].ChallengerFBID == @UserFacebookID){
                         friendFBID = activeGames[i].OpponentFBID;
@@ -258,8 +257,8 @@
 
        if(curFill != player1Fill && curFill != player2Fill)
        {
-            if(isMyTurn)
-            {
+           if(isMyTurn)
+           {
                 isMyTurn = false;
                 DeleteAppRequest(curAppRequest + '_' + userFBID);
 
@@ -371,7 +370,7 @@
 
         $('#board').children().remove();
 
-        game = new DartBoard(null, playMove, data); 
+        game = new DartBoard(null, playMove, data,player1Fill,player2Fill,winFill); 
         game.setMoves(data.Moves);
 
 //        $.get("/game/" + gameId + "/moves", function (data) {
